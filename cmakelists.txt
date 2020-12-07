@@ -5,7 +5,3 @@ project(chess)
 file(GLOB source "src/*.cpp")
 
 add_executable(chess ${source})
-
-# Output
-set_target_properties(chess PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}"
-                                      RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
