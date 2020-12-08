@@ -2,8 +2,25 @@ cmake_minimum_required(VERSION 3.0)
 
 add_subdirectory("deps/SFML-2.5.1")
 
+# set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/deps/imgui-1.79")
+# set(IMGUI_SFML_FIND_SFML OFF)
+# add_subdirectory("deps/imgui-sfml-2.1")
+
 project(chess)
-file(GLOB source "src/*.cpp")
+
+file(GLOB source "${CMAKE_SOURCE_DIR}/src/*.cpp")
+list(APPEND source
+    "${CMAKE_SOURCE_DIR}/deps/imgui-1.79/imgui.cpp"
+    "${CMAKE_SOURCE_DIR}/deps/imgui-1.79/imgui_draw.cpp"
+    "${CMAKE_SOURCE_DIR}/deps/imgui-1.79/imgui_widgets.cpp"
+    "${CMAKE_SOURCE_DIR}/deps/imgui-1.79/imgui_demo.cpp"
+    "${CMAKE_SOURCE_DIR}/deps/imgui-sfml-2.1/imgui-SFML.cpp"
+)
+
+message(STATUS ${source})
+
 add_executable(chess ${source})
-target_include_directories(chess PRIVATE "deps/SFML-2.5.1/include")
-target_link_libraries(chess sfml-main sfml-system sfml-window sfml-graphics sfml-audio sfml-network)
+
+target_include_directories(chess PRIVATE "deps/SFML-2.5.1/include" "deps/imgui-1.79" "deps/imgui-sfml-2.1")
+
+target_link_libraries(chess sfml-main sfml-system sfml-window sfml-graphics sfml-audio sfml-network opengl32)
