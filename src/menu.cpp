@@ -8,6 +8,8 @@
 
 #include "app.hpp"
 
+#include "game.hpp"
+
 void Menu::handle_events(const sf::Event& event)
 {}
 
@@ -27,7 +29,7 @@ void Menu::render(const sf::RenderTarget& target)
     ImGui::Separator();
 
     button("Host", &Menu::host);
-    button("join", &Menu::join);
+    button("Join", &Menu::join);
 
     ImGui::End();
 }
@@ -48,10 +50,14 @@ void Menu::button(const std::string& name, void(Menu::*fn)())
 void Menu::host()
 {
     app.change_state("game");
+    app.get_state<Game>("game").set_hosting(true);
+    app.get_state<Game>("game").start();
 }
 
 
 void Menu::join()
 {
     app.change_state("game");
+    app.get_state<Game>("game").set_hosting(false);
+    app.get_state<Game>("game").start();
 }
