@@ -10,15 +10,15 @@
 
 #include "game.hpp"
 
-void Menu::handle_events(const sf::Event& event)
+void Menu::on_handle_events(const sf::Event& event)
 {}
 
 
-void Menu::update(sf::Time dt)
+void Menu::on_update(sf::Time dt)
 {}
 
 
-void Menu::render(const sf::RenderTarget& target)
+void Menu::on_render(const sf::RenderTarget& target)
 {
     ImGui::SetNextWindowPos(ImVec2(0,0));
     ImGui::SetNextWindowSize(ImVec2(300,600));
