@@ -22,24 +22,36 @@ void Menu::render(const sf::RenderTarget& target)
     ImGui::SetNextWindowSize(ImVec2(300,600));
     ImGui::Begin("Demo window", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-    ImVec2 bsize(200,20);
-    float xpos {(ImGui::GetWindowWidth()/2.0f) - 100.0f};
-
     ImGui::SetCursorPosX((ImGui::GetWindowWidth()/2.0f) - 20.0f);
     ImGui::Text("Chess");
     ImGui::Separator();
 
-    ImGui::SetCursorPosX(xpos);
-    if(ImGui::Button("Host", bsize))
-    { app.change_state("game"); }
-
-    ImGui::SetCursorPosX(xpos);
-    if(ImGui::Button("Join", bsize))
-    { app.change_state("game"); }
-
-    ImGui::SetCursorPosX(xpos);
-    if(ImGui::Button("AI", bsize))
-    { app.change_state("game"); }
+    button("Host", &Menu::host);
+    button("join", &Menu::join);
 
     ImGui::End();
+}
+
+
+void Menu::button(const std::string& name, void(Menu::*fn)())
+{
+    static const float xpos {(ImGui::GetWindowWidth()/2.0f) - 100.0f};
+    static const ImVec2 bsize(200,20);
+
+    ImGui::SetCursorPosX(xpos);
+
+    if(ImGui::Button(name.c_str(), bsize))
+    { (this->*fn)(); }
+}
+
+
+void Menu::host()
+{
+    app.change_state("game");
+}
+
+
+void Menu::join()
+{
+    app.change_state("game");
 }

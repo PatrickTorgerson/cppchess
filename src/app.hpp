@@ -35,6 +35,14 @@ public:
         { throw std::runtime_error("Cannot add duplicate State"); }
     }
 
+    template <typename T>
+    T& get_state(const std::string& name)
+    {
+        static_assert(std::is_base_of_v<State, T>, "type T must be derived from State to be added as a state");
+
+        return *dynamic_cast<T*>(states[name].get());
+    }
+
     void change_state(const std::string& name);
 
 private:
