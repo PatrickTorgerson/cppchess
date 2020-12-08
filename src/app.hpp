@@ -40,7 +40,13 @@ public:
     {
         static_assert(std::is_base_of_v<State, T>, "type T must be derived from State to be added as a state");
 
-        return *dynamic_cast<T*>(states[name].get());
+        auto it = states.find(name);
+
+        if(it != states.end())
+        {
+            return *dynamic_cast<T*>(it->second.get());
+        }
+        throw std::runtime_error("State does not exist");
     }
 
     void change_state(const std::string& name);
