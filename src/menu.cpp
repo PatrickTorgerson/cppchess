@@ -6,6 +6,8 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
+#include "app.hpp"
+
 void Menu::handle_events(const sf::Event& event)
 {}
 
@@ -28,11 +30,16 @@ void Menu::render(const sf::RenderTarget& target)
     ImGui::Separator();
 
     ImGui::SetCursorPosX(xpos);
-    ImGui::Button("Host", bsize);
+    if(ImGui::Button("Host", bsize))
+    { app.change_state("game"); }
+
     ImGui::SetCursorPosX(xpos);
-    ImGui::Button("Join", bsize);
+    if(ImGui::Button("Join", bsize))
+    { app.change_state("game"); }
+
     ImGui::SetCursorPosX(xpos);
-    ImGui::Button("AI", bsize);
+    if(ImGui::Button("AI", bsize))
+    { app.change_state("game"); }
 
     ImGui::End();
 }

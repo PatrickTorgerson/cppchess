@@ -6,11 +6,12 @@
 #include <SFML/System.hpp>
 
 
-void App::run()
+void App::run(const std::string& state)
 {
     ImGui::SFML::Init(win);
-
     sf::Clock clock;
+
+    change_state(state);
 
     while(win.isOpen())
     {
@@ -20,6 +21,11 @@ void App::run()
     }
 
     ImGui::SFML::Shutdown();
+}
+
+void App::change_state(const std::string& name)
+{
+    current_state = states[name].get();
 }
 
 
@@ -34,7 +40,9 @@ void App::handle_events()
         }
 
         ImGui::SFML::ProcessEvent(event);
-        current_state->handle_events(event);
+
+        if(current_state)
+        { current_state->handle_events(event); }
     }
 }
 
@@ -42,14 +50,20 @@ void App::handle_events()
 void App::update(sf::Time dt)
 {
     ImGui::SFML::Update(win, dt);
-    current_state->update(dt);
+
+    if(current_state)
+    { current_state->update(dt); }
 }
 
 
 void App::render()
 {
     win.clear();
-    current_state->render(win);
+
+    if(current_state)
+    { current_state->render(win); }
+
+
     ImGui::SFML::Render(win);
     win.display();
 }

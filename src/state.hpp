@@ -2,9 +2,14 @@
 
 #include "sfml-forward.hpp"
 
+class App;
+
 class State
 {
+protected:
+    App& app;
 public:
+    State(App& a): app{a} {}
 
     virtual ~State() = default;
 

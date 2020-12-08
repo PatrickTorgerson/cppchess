@@ -3,16 +3,39 @@
 #include <SFML/Graphics.hpp>
 
 #include "state.hpp"
-#include "menu.hpp"
+
+#include <string>
+#include <map>
+#include <memory>
 
 class App
 {
     sf::RenderWindow win {sf::VideoMode(640, 480), "Chess"};
-    State* current_state {new Menu()}; // <-- Memory Leak!
+
+    std::map<std::string,std::unique_ptr<State>> states;
+    State* current_state {nullptr};
 
 public:
 
-    void run();
+    void run(const std::string& state);
+
+    template <typename T, typename ... Args>
+    void add_state(const std::string& name, Args&& ... args)
+    {
+        static_assert(std::is_base_of_v<State, T>, "type T must be derived from State to be added as a state");
+
+        auto& [it,success] = states.insert(
+            {
+                name,
+                std::make_unique<T>(*this, std::forward<Args>(args)...)
+            }
+        );
+
+        if(!success)
+        { throw std::runtime_error("Cannot add duplicate State"); }
+    }
+
+    void change_state(const std::string& name);
 
 private:
 
