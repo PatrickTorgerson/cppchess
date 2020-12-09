@@ -11,78 +11,84 @@
 
 #include <iostream>
 
-sf::TcpListener listener;
-sf::TcpSocket socket;
-sf::SocketSelector selector;
-sf::Packet packet;
+// Network state
+static sf::TcpListener listener;
+static sf::TcpSocket socket;
+static sf::SocketSelector selector;
+static sf::Packet packet;
+constexpr int port = 24377;
 
-void wait_for_data()
+void wait_for_data(Game* game)
 {
-    std::scoped_lock lock(mutex);
     if(selector.wait())
     {
         if(selector.isReady(socket))
         {
             socket.receive(packet);
-            packet >> board;
+            std::string b;
+            packet >> b;
+            game->set_board(b);
             packet.clear();
-            std::cout <<board << std::endl;
+            std::cout << b << std::endl;
         }
     }
 }
 
-void send_data()
+void send_data(Game* game)
 {
-    std::scoped_lock lock(mutex);
-    packet << board;
+    packet << game->get_board();
     socket.send(packet);
     packet.clear();
 }
 
 void network_handling(Game* game,bool server)
 {
-    
-    if(game->get_white())
+    if(server)
+    {
+        std::cout << "Waiting for players...\n";
+        listener.listen(port);
+        listener.accept(socket);
+        std::cout << "new client at: " << socket.getRemoteAddress() << std::endl;
+    }
+    else
+    {
+        std::string ip;
+        std::cout << "Enter an IP Address to connect to : ";
+        std::cin >> ip;
+        sf::Socket::Status status = socket.connect(ip, port);
+        if(status == sf::Socket::Done)
+        {
+            std::cout << "Connect to server at: " << socket.getRemoteAddress() << std::endl;
+        }
+    }
+
+    selector.add(socket);
+
+    using namespace std::literals::chrono_literals;
+
+    if(game->get_white()) // <- TODO: OPTIMIZE! pass white as param
     {
         game->set_turn(true);
         while(!game->get_move_made())
-        {} 
-        game->send_data();
+        {
+            std::this_thread::sleep_for(1s);
+        }
+        send_data(game);
     }
     while(true)
     {
-        game->wait_for_data();
+        wait_for_data(game);
         game->set_turn(true);
         while(!game->get_move_made())
-        {} 
-        game->send_data();
+        {
+            std::this_thread::sleep_for(1s);
+        }
+        send_data(game);
     }
 }
-
-void Game::start_server()
-{
-    std::cout<<"Waiting for players...\n";
-    listener.listen(port);
-    listener.accept(socket);
-    std::cout<<"new client at: " << socket.getRemoteAddress() << std::endl;
-    white = true;
-}
-
-void Game::start_client()
-{
-    std::cout << "Enter an IP Address to connect to :";
-    std::cin >> ip_address;
-    sf::Socket::Status status = socket.connect(ip_address, port);
-    if(status == sf::Socket::Done)
-    {
-        std::cout<<"Connect to server at:" << socket.getRemoteAddress() << std::endl;
-    }
-}
-
 
 void Game::on_handle_events(const sf::Event& event)
 {}
-
 
 void Game::on_update(sf::Time dt)
 {
@@ -94,7 +100,6 @@ void Game::on_update(sf::Time dt)
         turn = false;
     }
 }
-
 
 void Game::on_render(const sf::RenderTarget& target)
 {
@@ -108,11 +113,8 @@ void Game::set_hosting(bool host)
 
 void Game::start()
 {
-    if(hosting)
-        start_server();
-    else
-        start_client();
-    selector.add(socket);
+
+    white = hosting;
     turn = white;
     network_thread = std::thread(network_handling,this,hosting);
 }
@@ -127,11 +129,23 @@ void Game::set_turn(bool t)
     std::scoped_lock lock(mutex);
     turn = t;
 }
-    
+
 bool Game::get_move_made()
 {
     std::scoped_lock lock(mutex);
     return turn == false;
+}
+
+void Game::set_board(std::string b)
+{
+    std::scoped_lock lock(mutex);
+    board = std::move(b);
+}
+
+std::string Game::get_board() const
+{
+    std::scoped_lock lock(mutex);
+    return board;
 }
 
 bool Game::get_white()

@@ -9,11 +9,10 @@ class App;
 class Game final : public State
 {
     std::thread network_thread;
- 
+
     //Network variables
     std::string ip_address;
     std::string board;
-    int port = 24377;
     bool hosting = false;
 
     //Chess Variables
@@ -26,7 +25,7 @@ class Game final : public State
 
 public:
     Game(App& app) : State(app) {}
-    
+
     virtual void on_handle_events(const sf::Event& event) override;
     virtual void on_update(sf::Time dt) override;
     virtual void on_render(const sf::RenderTarget& target) override;
@@ -36,4 +35,7 @@ public:
     void set_turn(bool t);
     bool get_move_made();
     bool get_white();
+
+    void set_board(std::string b);
+    std::string get_board() const;
 };

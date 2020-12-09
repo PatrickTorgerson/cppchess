@@ -13,7 +13,7 @@ class State
 {
 protected:
     App& app;
-    std::mutex mutex;
+    mutable std::mutex mutex;
 public:
 
     State(App& a): app{a} {}
