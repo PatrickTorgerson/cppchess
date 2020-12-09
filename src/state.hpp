@@ -3,6 +3,9 @@
 #include "sfml-forward.hpp"
 
 #include <mutex>
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
+
 
 class App;
 
@@ -24,12 +27,12 @@ public:
     void update(sf::Time dt)
     {
         std::scoped_lock lock(mutex);
-        update(dt);
+        on_update(dt);
     }
     void render(const sf::RenderTarget& target)
     {
         std::scoped_lock lock(mutex);
-        render(target);
+        on_render(target);
     }
 
 protected:
