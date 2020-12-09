@@ -2,6 +2,7 @@
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
 
 #include "imgui.h"
 #include "imgui-SFML.h"
@@ -10,8 +11,37 @@
 
 #include <iostream>
 
-void network_handling(Game* game)
+sf::TcpListener listener;
+sf::TcpSocket socket;
+sf::SocketSelector selector;
+sf::Packet packet;
+
+void wait_for_data()
 {
+    std::scoped_lock lock(mutex);
+    if(selector.wait())
+    {
+        if(selector.isReady(socket))
+        {
+            socket.receive(packet);
+            packet >> board;
+            packet.clear();
+            std::cout <<board << std::endl;
+        }
+    }
+}
+
+void send_data()
+{
+    std::scoped_lock lock(mutex);
+    packet << board;
+    socket.send(packet);
+    packet.clear();
+}
+
+void network_handling(Game* game,bool server)
+{
+    
     if(game->get_white())
     {
         game->set_turn(true);
@@ -31,14 +61,11 @@ void network_handling(Game* game)
 
 void Game::start_server()
 {
-    //TODO
-    //Display text on screen "Waiting for players..."
     std::cout<<"Waiting for players...\n";
     listener.listen(port);
     listener.accept(socket);
     std::cout<<"new client at: " << socket.getRemoteAddress() << std::endl;
     white = true;
-    //choose color
 }
 
 void Game::start_client()
@@ -87,31 +114,7 @@ void Game::start()
         start_client();
     selector.add(socket);
     turn = white;
-    network_thread = std::thread(network_handling,this);
-}
-
-void Game::wait_for_data()
-{
-    std::scoped_lock lock(mutex);
-    if(selector.wait())
-    {
-        if(selector.isReady(socket))
-        {
-            socket.receive(packet);
-            packet >> board;
-            packet.clear();
-            std::cout <<board << std::endl;
-        }
-    }
-
-}
-
-void Game::send_data()
-{
-    std::scoped_lock lock(mutex);
-    packet << board;
-    socket.send(packet);
-    packet.clear();
+    network_thread = std::thread(network_handling,this,hosting);
 }
 
 void Game::choose_color()

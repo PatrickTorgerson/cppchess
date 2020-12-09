@@ -1,7 +1,7 @@
 #pragma once
 
 #include "state.hpp"
-#include <SFML/Network.hpp>
+
 #include <thread>
 
 class App;
@@ -9,13 +9,7 @@ class App;
 class Game final : public State
 {
     std::thread network_thread;
-    
-    //Network objects
-    sf::TcpListener listener;
-    sf::TcpSocket socket;
-    sf::SocketSelector selector;
-    sf::Packet packet;
-
+ 
     //Network variables
     std::string ip_address;
     std::string board;
@@ -39,8 +33,6 @@ public:
 
     void start();
     void set_hosting(bool host);
-    void wait_for_data();
-    void send_data();
     void set_turn(bool t);
     bool get_move_made();
     bool get_white();
