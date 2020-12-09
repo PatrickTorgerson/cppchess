@@ -37,6 +37,7 @@ void Game::start_server()
     listener.listen(port);
     listener.accept(socket);
     std::cout<<"new client at: " << socket.getRemoteAddress();
+    white = true;
     //choose color
 }
 
@@ -79,15 +80,13 @@ void Game::set_hosting(bool host)
 
 void Game::start()
 {
-    network_thread = std::thread(network_handling,this);
-
     if(hosting)
         start_server();
     else
         start_client();
-
     selector.add(socket);
     turn = white;
+    network_thread = std::thread(network_handling,this);
 }
 
 void Game::wait_for_data()
