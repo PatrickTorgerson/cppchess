@@ -99,7 +99,7 @@ void Game::wait_for_data()
         {
             socket.receive(packet);
             packet >> board;
-            packet.clear()
+            packet.clear();
             std::cout <<board << std::endl;
         }
     }
