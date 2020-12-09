@@ -55,10 +55,14 @@ void network_handling(Game* game,bool server)
         std::string ip;
         std::cout << "Enter an IP Address to connect to : ";
         std::cin >> ip;
-        sf::Socket::Status status = socket.connect(ip, port);
+        sf::Socket::Status status = socket.connect(ip, port, sf::seconds(20));
         if(status == sf::Socket::Done)
         {
             std::cout << "Connect to server at: " << socket.getRemoteAddress() << std::endl;
+        }
+        else
+        {
+            std::cout << "Failed to connect!\n";
         }
     }
 
@@ -113,9 +117,7 @@ void Game::set_hosting(bool host)
 
 void Game::start()
 {
-
     white = hosting;
-    turn = white;
     network_thread = std::thread(network_handling,this,hosting);
 }
 
