@@ -33,10 +33,10 @@ void Game::start_server()
 {
     //TODO
     //Display text on screen "Waiting for players..."
-    std::cout<<"Waiting for players...";
+    std::cout<<"Waiting for players...\n";
     listener.listen(port);
     listener.accept(socket);
-    std::cout<<"new client at: " << socket.getRemoteAddress();
+    std::cout<<"new client at: " << socket.getRemoteAddress() << std::endl;
     white = true;
     //choose color
 }
@@ -48,7 +48,7 @@ void Game::start_client()
     sf::Socket::Status status = socket.connect(ip_address, port);
     if(status == sf::Socket::Done)
     {
-        std::cout<<"Connect to server at:" << socket.getRemoteAddress();
+        std::cout<<"Connect to server at:" << socket.getRemoteAddress() << std::endl;
     }
 }
 
@@ -63,6 +63,7 @@ void Game::on_update(sf::Time dt)
     {
         std::cout << "Enter Text:";
         std::cin >> board;
+        std::cout <<"\n";
         turn = false;
     }
 }
@@ -98,7 +99,8 @@ void Game::wait_for_data()
         {
             socket.receive(packet);
             packet >> board;
-            std::cout << board;
+            packet.clear()
+            std::cout <<board << std::endl;
         }
     }
 
@@ -109,6 +111,7 @@ void Game::send_data()
     std::scoped_lock lock(mutex);
     packet << board;
     socket.send(packet);
+    packet.clear();
 }
 
 void Game::choose_color()
