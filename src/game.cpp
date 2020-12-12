@@ -39,7 +39,14 @@ void Game::on_update(sf::Time dt)
 
 void Game::on_render(const sf::RenderTarget& target)
 {
-    //display the board
+    // display the board
+    if(turn)
+    {
+        ImGui::Begin("Make a fkn move!");
+        if(ImGui::Button("move"))
+        { turn = false; }
+        ImGui::End();
+    }
 }
 
 
