@@ -5,6 +5,13 @@
 #include <iostream>
 
 
+Connection::~Connection()
+{
+    this->stop();
+    t.join();
+}
+
+
 void Connection::host(Game* game)
 {
     stop_flag = false;
@@ -151,6 +158,8 @@ void start_server(Game* g, Connection* c)
     std::cout << "Found oponent: " << c->socket.getRemoteAddress() << std::endl;
     c->set_status(Connection::Status::connected);
 
+    c->selector.add(c->socket);
+
     // Tells the client it's color and wait's for it to be ready
     c->send_color(!(g->is_white()));
     c->wait_for_client(!(g->is_white()));
@@ -164,7 +173,7 @@ void start_client(Game* g, Connection* c, const std::string& ip)
     std::cout << "Attempting to connect to " << ip << " ..." << std::endl;
     c->set_status(Connection::Status::connecting);
 
-    sf::Socket::Status status = c->socket.connect(ip, c->port, sf::seconds(20));
+    sf::Socket::Status status = c->socket.connect(ip, c->port, sf::seconds(15));
 
     if(status == sf::Socket::Done)
     {
@@ -177,6 +186,8 @@ void start_client(Game* g, Connection* c, const std::string& ip)
         c->stop();
         c->set_status(Connection::Status::failed);
     }
+
+    c->selector.add(c->socket);
 
     g->start(c->recieve_color());
 
@@ -193,8 +204,6 @@ void network_handling(Game* g, Connection* c)
 
     if(c->get_status() == Connection::Status::failed)
     { return; }
-
-    c->selector.add(c->socket);
 
     std::cout << "Let the games begin!" << std::endl;
 

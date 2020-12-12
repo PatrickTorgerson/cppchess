@@ -42,6 +42,8 @@ private:
 
 public:
 
+    ~Connection();
+
     // called in main thread;
     void host(Game* game);
     void join(Game* game, const std::string& ip);
