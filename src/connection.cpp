@@ -213,7 +213,7 @@ void network_handling(Game* g, Connection* c)
         g->go();
 
         while(!g->done())
-        { std::this_thread::sleep_for(1s); }
+        { std::this_thread::sleep_for(200ms); }
 
         c->send_board(g);
     }
@@ -226,7 +226,7 @@ void network_handling(Game* g, Connection* c)
         g->go();
 
         while(!g->done())
-        { std::this_thread::sleep_for(1s); }
+        { std::this_thread::sleep_for(200ms); }
 
         c->send_board(g);
     }
