@@ -14,7 +14,7 @@ class Menu final : public State
     bool join_flag {false};
     bool host_flag {false};
 
-    char ip_buff[50] {'\0'};
+    char ip_buff[50] {"127.0.0.1"};
 public:
 
     Menu(App& app) : State(app) {}
